@@ -1,0 +1,88 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam roundcorner 8
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #334155
+    ArrowColor #2563EB
+}
+
+title Lab 2: Bridge Pattern - Report Formatter x DataSource x Compressor Architecture
+
+package "Abstraction Hierarchy" {
+    abstract class TimesFormatter {
+        # source: DataSource
+        # compressor: Compressor
+        + __construct(source: DataSource, compressor: Compressor)
+        + setCompressor(compressor: Compressor): void
+        + generate(title: string): string
+        {abstract} # toText(records: array): string
+    }
+
+    class AttendanceTimesFormatter {
+        # toText(records: array): string
+    }
+
+    class TimesheetJsonFormatter {
+        # toText(records: array): string
+    }
+
+    class TimesheetCsvFormatter {
+        # toText(records: array): string
+    }
+
+    TimesFormatter <|-- AttendanceTimesFormatter
+    TimesFormatter <|-- TimesheetJsonFormatter
+    TimesFormatter <|-- TimesheetCsvFormatter
+}
+
+package "Implementor Hierarchy A (Data Source)" {
+    interface DataSource <<interface>> {
+        + fetch(): array
+    }
+
+    class ApiDataSource {
+        + fetch(): array
+    }
+
+    class FileDataSource {
+        + fetch(): array
+    }
+
+    DataSource <|.. ApiDataSource : implements
+    DataSource <|.. FileDataSource : implements
+}
+
+package "Implementor Hierarchy B (Compression)" {
+    interface Compressor <<interface>> {
+        + compress(content: string): string
+        + isCompressed(): bool
+    }
+
+    class GzipCompressor {
+        + compress(content: string): string
+        + isCompressed(): bool
+    }
+
+    class NoneCompressor {
+        + compress(content: string): string
+        + isCompressed(): bool
+    }
+
+    Compressor <|.. GzipCompressor : implements
+    Compressor <|.. NoneCompressor : implements
+}
+
+' Bridge connections (Aggregation)
+TimesFormatter o--> "1" DataSource : "Bridge to Source\n(delegates fetch())"
+TimesFormatter o--> "1" Compressor : "Bridge to Compressor\n(delegates compress())"
+
+note bottom of TimesFormatter
+  The Bridge decouples the Formatter abstraction
+  from its data retrieval and compression implementations.
+  New Formats, DataSources, or Compressors can be added
+  independently without Cartesian class explosion (M + N + K vs M x N x K).
+end note
+
+@enduml

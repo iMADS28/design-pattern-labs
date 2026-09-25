@@ -1,0 +1,26 @@
+[
+  {
+    "userId": 1,
+    "id": 1,
+    "title": "Bridge Pattern Overview",
+    "body": "Decouples an abstraction from its implementation so that the two can vary independently."
+  },
+  {
+    "userId": 1,
+    "id": 2,
+    "title": "Compression Implementor",
+    "body": "Gzip and plain text compression algorithms encapsulated behind a clean interface."
+  },
+  {
+    "userId": 2,
+    "id": 3,
+    "title": "DataSource Implementor",
+    "body": "Swapping between remote HTTP API endpoints and local filesystem JSON seamlessly."
+  },
+  {
+    "userId": 2,
+    "id": 4,
+    "title": "Combinatorial Scalability",
+    "body": "Avoids M x N subclass explosion by composing abstraction handles with body implementors."
+  }
+]
