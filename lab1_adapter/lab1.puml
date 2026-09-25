@@ -1,0 +1,82 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam roundcorner 8
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #334155
+    ArrowColor #2563EB
+}
+
+title Lab 1: Adapter Pattern - File Writer Architecture
+
+interface FileWriter <<interface>> {
+    + write(filename: string, rows: array): bool
+}
+
+class ReportExporter {
+    - writer: FileWriter
+    + __construct(writer: FileWriter)
+    + export(filename: string, rows: array): void
+}
+
+class CsvFileAdapter {
+    - csv: CsvLibrary
+    + __construct(csv: CsvLibrary)
+    + write(filename: string, rows: array): bool
+}
+
+class JsonFileAdapter {
+    - json: JsonLibrary
+    + __construct(json: JsonLibrary)
+    + write(filename: string, rows: array): bool
+}
+
+class TextFileAdapter {
+    - text: TextLibrary
+    + __construct(text: TextLibrary)
+    + write(filename: string, rows: array): bool
+}
+
+class XmlWriterAdapter {
+    - xml: XmlLibrary
+    + __construct(xml: XmlLibrary)
+    + write(filename: string, rows: array): bool
+}
+
+class CsvLibrary <<Adaptee>> {
+    + writeCsv(path: string, rows: array): bool
+}
+
+class JsonLibrary <<Adaptee>> {
+    + saveJson(path: string, payload: mixed): bool
+}
+
+class TextLibrary <<Adaptee>> {
+    + appendLine(path: string, line: string): bool
+}
+
+class XmlLibrary <<Adaptee>> {
+    + writeXml(path: string, rows: array): bool
+}
+
+ReportExporter o--> FileWriter : delegates export() to write()
+
+FileWriter <|.. CsvFileAdapter : implements
+FileWriter <|.. JsonFileAdapter : implements
+FileWriter <|.. TextFileAdapter : implements
+FileWriter <|.. XmlWriterAdapter : implements
+
+CsvFileAdapter *--> CsvLibrary : wraps & translates\nwrite() -> writeCsv()
+JsonFileAdapter *--> JsonLibrary : wraps & translates\nwrite() -> saveJson()
+TextFileAdapter *--> TextLibrary : wraps & translates\nwrite() -> loop appendLine()
+XmlWriterAdapter *--> XmlLibrary : wraps & translates\nwrite() -> writeXml()
+
+note right of ReportExporter
+  Client depends strictly
+  on FileWriter abstraction.
+  Adding XmlWriterAdapter requires
+  zero modifications to ReportExporter.
+end note
+
+@enduml
