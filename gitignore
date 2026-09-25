@@ -1,0 +1,22 @@
+# Dependencies
+vendor/
+
+# Logs and TeX / build artifacts
+*.log
+*.aux
+*.tmp
+*.out
+
+# Environment and credentials
+.env
+.env.local
+
+# Local test data with private records (if local)
+# data.json
+data.local.json
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
