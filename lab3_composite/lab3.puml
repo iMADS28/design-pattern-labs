@@ -1,0 +1,100 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam roundcorner 8
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #334155
+    ArrowColor #2563EB
+}
+
+title Lab 3: Composite Pattern - Forum Hierarchy & RAG Document Tree
+
+package "Forum Part-Whole Hierarchy" {
+    interface ForumComponent <<Component>> {
+        + display(depth: int): void
+    }
+
+    class Post <<Leaf>> {
+        - author: string
+        - message: string
+        + __construct(author: string, message: string)
+        + display(depth: int): void
+    }
+
+    class Bundle <<Leaf - Extensibility Demo>> {
+        - title: string
+        - items: array
+        + __construct(title: string, items: array)
+        + display(depth: int): void
+    }
+
+    class Thread <<Composite>> {
+        - title: string
+        - children: ForumComponent[]
+        + __construct(title: string)
+        + add(c: ForumComponent): void
+        + display(depth: int): void
+        + {static} fromApi(postId: int): Thread
+    }
+
+    ForumComponent <|.. Post : implements
+    ForumComponent <|.. Bundle : implements
+    ForumComponent <|.. Thread : implements
+
+    Thread *--> "0..*" ForumComponent : contains & delegates display()
+}
+
+package "RAG Document Part-Whole Hierarchy" {
+    interface TextComponent <<Component>> {
+        + getText(): string
+        + embed(): array
+    }
+
+    class Chunk <<Leaf>> {
+        - text: string
+        + __construct(text: string)
+        + getText(): string
+        + embed(): array
+    }
+
+    class Section <<Composite>> {
+        - heading: string
+        - children: TextComponent[]
+        + __construct(heading: string)
+        + add(c: TextComponent): void
+        + getText(): string
+        + embed(): array
+    }
+
+    class Document <<Composite>> {
+        - title: string
+        - children: TextComponent[]
+        + __construct(title: string)
+        + add(c: TextComponent): void
+        + getText(): string
+        + embed(): array
+    }
+
+    TextComponent <|.. Chunk : implements
+    TextComponent <|.. Section : implements
+    TextComponent <|.. Document : implements
+
+    Section *--> "0..*" TextComponent : contains & delegates getText()/embed()
+    Document *--> "0..*" TextComponent : contains & delegates getText()/embed()
+}
+
+note bottom of Thread
+  Clients interact with ForumComponent uniformly.
+  Thread iterates over its children without knowing
+  whether each child is a Post, a Bundle, or a nested Thread.
+  No 'instanceof' branching required.
+end note
+
+note bottom of Document
+  Document and Section composites recursively concatenate
+  text and build hierarchical embeddings, treating individual
+  Chunks and nested Sections identically.
+end note
+
+@enduml

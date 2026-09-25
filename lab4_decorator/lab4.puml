@@ -1,0 +1,62 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam roundcorner 8
+skinparam class {
+    BackgroundColor #F8FAFC
+    BorderColor #334155
+    ArrowColor #2563EB
+}
+
+title Lab 4: Decorator Pattern - HTTP Middleware Pipeline Architecture
+
+interface HttpClient <<Component>> {
+    + get(url: string): string
+}
+
+class BaseHttpClient <<ConcreteComponent>> {
+    + get(url: string): string
+}
+
+abstract class HttpDecorator <<Decorator>> {
+    # wrapped: HttpClient
+    + __construct(wrapped: HttpClient)
+}
+
+class LoggingDecorator <<ConcreteDecorator>> {
+    + get(url: string): string
+}
+
+class CachingDecorator <<ConcreteDecorator>> {
+    - cache: array
+    + get(url: string): string
+}
+
+class RetryDecorator <<ConcreteDecorator>> {
+    + get(url: string): string
+}
+
+class TokenCounterDecorator <<ConcreteDecorator>> {
+    + get(url: string): string
+}
+
+HttpClient <|.. BaseHttpClient : implements
+HttpClient <|.. HttpDecorator : implements
+
+HttpDecorator o--> "1" HttpClient : wraps (composition)
+
+HttpDecorator <|-- LoggingDecorator
+HttpDecorator <|-- CachingDecorator
+HttpDecorator <|-- RetryDecorator
+HttpDecorator <|-- TokenCounterDecorator
+
+note bottom of HttpDecorator
+  Wrapping Chain Example:
+  TokenCounter(Retry(Caching(Logging(BaseHttpClient))))
+
+  Order Matters:
+  - Logging(Caching(Base)): logs all requests including cache hits.
+  - Caching(Logging(Base)): cache hits return immediately without logging.
+end note
+
+@enduml
